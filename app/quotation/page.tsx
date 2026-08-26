@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { packages } from "../data/packages";
 import {
+  quotationEventTypes,
   signatureCoverageOptions,
   signatureDeliverables,
   signatureEventAddOns,
   signatureEvents,
   signatureRates,
   type SignatureCoverageOption,
+  type QuotationEventTypeId,
 } from "../data/signature";
 import { saveQuotation } from "../data/quotations";
 
@@ -21,6 +23,24 @@ type ClientDetails = {
 };
 
 type Package = (typeof packages)[number];
+type CustomEventPackage = {
+  id: string;
+  name: string;
+  price: null;
+  description: string;
+  customizable: true;
+  photography?: string[];
+  videography?: string[];
+  deliverables?: string[];
+};
+type SelectedPackage = Package | CustomEventPackage;
+
+const nonWeddingEventTypes = new Set<QuotationEventTypeId>([
+  "birthday",
+  "half-saree",
+  "engagement",
+  "other-event-up-to-5-hours",
+]);
 
 const formatPrice = (amount: number) =>
   new Intl.NumberFormat("en-IN", {
@@ -30,7 +50,8 @@ const formatPrice = (amount: number) =>
   }).format(amount);
 
 export default function QuotationPage() {
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  const [selectedEventType, setSelectedEventType] = useState<QuotationEventTypeId | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<SelectedPackage | null>(null);
   const [selectedSignatureEvents, setSelectedSignatureEvents] = useState<string[]>([]);
   const [selectedCoverage, setSelectedCoverage] = useState<
     Record<string, SignatureCoverageOption[]>
@@ -52,6 +73,9 @@ export default function QuotationPage() {
   const selectedEvents = signatureEvents.filter((event) =>
     selectedSignatureEvents.includes(event.id)
   );
+  const availableCoverageEvents = selectedEventType === "wedding"
+    ? signatureEvents.filter((event) => !nonWeddingEventTypes.has(event.id as QuotationEventTypeId))
+    : signatureEvents.filter((event) => event.id === selectedEventType);
   const signatureTotal = selectedEvents.reduce(
     (total, event) =>
       total +
@@ -80,6 +104,30 @@ export default function QuotationPage() {
     setSelectedDeliverables([]);
     setSelectedEventAddOns({});
     setIsQuotationGenerated(false);
+  };
+
+  const selectEventType = (eventTypeId: QuotationEventTypeId) => {
+    const eventType = quotationEventTypes.find((item) => item.id === eventTypeId);
+    if (!eventType) return;
+    setSelectedEventType(eventTypeId);
+    setSelectedCoverage({});
+    setSelectedDeliverables([]);
+    setSelectedEventAddOns({});
+    setSavedQuoteNumber("");
+    setIsQuotationGenerated(false);
+    if (eventTypeId === "wedding") {
+      setSelectedPackage(null);
+      setSelectedSignatureEvents([]);
+      return;
+    }
+    setSelectedPackage({
+      id: `${eventTypeId}-coverage`,
+      name: `${eventType.name} Coverage`,
+      price: null,
+      description: eventType.description,
+      customizable: true,
+    });
+    setSelectedSignatureEvents([eventTypeId]);
   };
 
   const updateClientDetail = (field: keyof ClientDetails, value: string) => {
@@ -232,34 +280,46 @@ export default function QuotationPage() {
 
         <section className="mt-9">
           <div className="flex items-baseline justify-between gap-4">
-            <h2 className="text-2xl font-semibold">1. Select a package</h2>
-            <p className="text-sm text-yellow-100/55">All prices are in INR</p>
+            <h2 className="text-2xl font-semibold">1. Select event type</h2>
+            <p className="text-sm text-yellow-100/55">Choose the occasion first</p>
           </div>
           <div className="mt-5 grid gap-5 md:grid-cols-3">
-            {packages.map((pkg) => {
-              const isSelected = selectedPackage?.id === pkg.id;
+            {quotationEventTypes.map((eventType) => {
+              const isSelected = selectedEventType === eventType.id;
               return (
-                <button key={pkg.id} type="button" onClick={() => selectPackage(pkg)} aria-pressed={isSelected} className={`rounded-2xl border p-6 text-left transition ${isSelected ? "border-yellow-300 bg-yellow-400/15 ring-1 ring-yellow-300" : "border-yellow-500/25 bg-black/20 hover:border-yellow-400 hover:bg-white/5"}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-xl font-bold text-yellow-100">{pkg.name}</h3>
-                    <span className="text-sm font-semibold text-yellow-300">{pkg.price ? formatPrice(pkg.price) : "Custom"}</span>
-                  </div>
-                  <p className="mt-3 text-sm leading-6 text-yellow-100/65">{pkg.description}</p>
-                  <p className="mt-5 text-sm font-semibold text-yellow-200">{isSelected ? "Selected" : "Choose package"}</p>
+                <button key={eventType.id} type="button" onClick={() => selectEventType(eventType.id)} aria-pressed={isSelected} className={`rounded-2xl border p-6 text-left transition ${isSelected ? "border-yellow-300 bg-yellow-400/15 ring-1 ring-yellow-300" : "border-yellow-500/25 bg-black/20 hover:border-yellow-400 hover:bg-white/5"}`}>
+                  <h3 className="text-xl font-bold text-yellow-100">{eventType.name}</h3>
+                  <p className="mt-3 text-sm leading-6 text-yellow-100/65">{eventType.description}</p>
+                  <p className="mt-5 text-sm font-semibold text-yellow-200">{isSelected ? "Selected" : "Choose event"}</p>
                 </button>
               );
             })}
           </div>
         </section>
 
+        {selectedEventType === "wedding" && (
+          <section className="mt-9">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="text-2xl font-semibold">2. Select a Wedding package</h2>
+              <p className="text-sm text-yellow-100/55">All prices are in INR</p>
+            </div>
+            <div className="mt-5 grid gap-5 md:grid-cols-3">
+              {packages.map((pkg) => {
+                const isSelected = selectedPackage?.id === pkg.id;
+                return <button key={pkg.id} type="button" onClick={() => selectPackage(pkg)} aria-pressed={isSelected} className={`rounded-2xl border p-6 text-left transition ${isSelected ? "border-yellow-300 bg-yellow-400/15 ring-1 ring-yellow-300" : "border-yellow-500/25 bg-black/20 hover:border-yellow-400 hover:bg-white/5"}`}><div className="flex items-start justify-between gap-3"><h3 className="text-xl font-bold text-yellow-100">{pkg.name}</h3><span className="text-sm font-semibold text-yellow-300">{pkg.price ? formatPrice(pkg.price) : "Custom"}</span></div><p className="mt-3 text-sm leading-6 text-yellow-100/65">{pkg.description}</p><p className="mt-5 text-sm font-semibold text-yellow-200">{isSelected ? "Selected" : "Choose package"}</p></button>;
+              })}
+            </div>
+          </section>
+        )}
+
         {selectedPackage && !selectedPackage.customizable && <PackageDetails selectedPackage={selectedPackage} />}
 
         {selectedPackage?.customizable && (
           <section className="mt-9 rounded-2xl border border-yellow-500/25 bg-black/20 p-6 sm:p-7">
-            <h2 className="text-2xl font-semibold">2. Create your Signature coverage</h2>
+            <h2 className="text-2xl font-semibold">{selectedEventType === "wedding" ? "3. Create your Signature coverage" : `2. Create your ${selectedPackage.name}`}</h2>
             <p className="mt-2 text-yellow-100/65">Choose the programs, then add the crew for each one. The estimate updates as you go.</p>
             <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {signatureEvents.map((event) => {
+              {availableCoverageEvents.map((event) => {
                 const isSelected = selectedSignatureEvents.includes(event.id);
                 const eventTotal = (selectedCoverage[event.id] ?? []).reduce((total, coverage) => total + signatureRates[coverage], 0);
                 return (
@@ -318,7 +378,7 @@ export default function QuotationPage() {
         )}
 
         <section className="mt-9">
-          <h2 className="text-2xl font-semibold">{selectedPackage?.customizable ? "3" : "2"}. Client details</h2>
+          <h2 className="text-2xl font-semibold">{selectedPackage?.customizable ? (selectedEventType === "wedding" ? "4" : "3") : "3"}. Client details</h2>
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <Input label="Client name" value={clientDetails.name} onChange={(value) => updateClientDetail("name", value)} placeholder="Client name" />
             <Input label="Mobile number" value={clientDetails.phone} onChange={(value) => updateClientDetail("phone", value)} placeholder="Mobile number" type="tel" />

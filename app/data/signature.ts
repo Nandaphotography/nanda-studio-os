@@ -4,6 +4,16 @@ export type SignatureEvent = {
   crew: string[];
 };
 
+export const quotationEventTypes = [
+  { id: "wedding", name: "Wedding", description: "Choose from Wedding packages or custom Signature coverage." },
+  { id: "birthday", name: "Birthday", description: "Create a custom event coverage quotation." },
+  { id: "half-saree", name: "Half Saree", description: "Create a custom event coverage quotation." },
+  { id: "engagement", name: "Engagement", description: "Create a custom event coverage quotation." },
+  { id: "other-event-up-to-5-hours", name: "Other Event (Up to 5 Hours)", description: "Create a custom event coverage quotation." },
+] as const;
+
+export type QuotationEventTypeId = (typeof quotationEventTypes)[number]["id"];
+
 export const signatureRates = {
   "Traditional Photographer": 5000,
   "Traditional Videographer": 5000,

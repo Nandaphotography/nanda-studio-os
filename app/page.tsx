@@ -11,6 +11,7 @@ const portfolioCategories = [
 
 const socialLinks = [
   { name: "Instagram", href: "https://www.instagram.com/nandaphotography_tirupati/" },
+  { name: "WhatsApp", href: "https://wa.me/918886494214" },
   { name: "YouTube", href: "https://www.youtube.com/@Nandaphotography" },
   { name: "Facebook", href: "https://www.facebook.com/Nandaphotograhy" },
 ];

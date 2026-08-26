@@ -1,11 +1,18 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BrandMark } from "./components/brand-mark";
 
 const portfolioCategories = [
-  { name: "Weddings", caption: "Timeless ceremonies & celebrations", tone: "from-[#5d3824] via-[#1e1510] to-[#0d0a09]" },
-  { name: "Pre-Wedding", caption: "Stories before the celebration", tone: "from-[#433448] via-[#201824] to-[#0d0a09]" },
-  { name: "Engagement", caption: "The beginning of forever", tone: "from-[#6a4c24] via-[#241b11] to-[#0d0a09]" },
-  { name: "Portraits & Events", caption: "Milestones, beautifully remembered", tone: "from-[#254449] via-[#112327] to-[#0d0a09]" },
+  { name: "Weddings", caption: "Timeless ceremonies & celebrations", image: "/portfolio/wedding.jpg", href: "https://drive.google.com/drive/folders/1OwfHbUqOqS0yUd0ro2P6F8ZNfi2IFh6L" },
+  { name: "Pre-Wedding", caption: "Stories before the celebration", image: "/portfolio/pre-wedding.jpg", href: "https://drive.google.com/drive/folders/1h5gzB7pUGwmYUIpEEpIgqoVMnRMQjYUr" },
+  { name: "Baby", caption: "Little moments, beautifully remembered", image: "/portfolio/baby.jpg", href: "https://drive.google.com/drive/folders/1y7de_t7XkbLKZUxpX_L3dynZ9Uz0dJXk" },
+  { name: "Nature", caption: "Frames beyond the celebration", image: "/portfolio/nature.jpg", href: "https://drive.google.com/drive/folders/1lW1vjegh825s6Tgh7NY4VEKTY8-Cq0sb" },
+];
+
+const socialLinks = [
+  { name: "Instagram", href: "https://www.instagram.com/nandaphotography_tirupati/" },
+  { name: "YouTube", href: "https://www.youtube.com/@Nandaphotography" },
+  { name: "Facebook", href: "https://www.facebook.com/Nandaphotograhy" },
 ];
 export default function Home() {
   return (
@@ -73,17 +80,19 @@ export default function Home() {
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {portfolioCategories.map((category, index) => (
-              <article key={category.name} className={`group relative min-h-72 overflow-hidden rounded-3xl border border-yellow-400/20 bg-gradient-to-br ${category.tone} p-6 shadow-xl shadow-black/25`}>
-                <div className="absolute -right-5 -top-9 text-[11rem] font-bold leading-none text-yellow-200/[0.06] transition duration-500 group-hover:scale-110">0{index + 1}</div>
+              <a key={category.name} href={category.href} target="_blank" rel="noreferrer" className="group relative min-h-72 overflow-hidden rounded-3xl border border-yellow-400/20 bg-[#0d0a09] p-6 shadow-xl shadow-black/25">
+                <Image src={category.image} alt={`${category.name} photography by Nanda Photography`} fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover transition duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                <div className="absolute -right-5 -top-9 text-[11rem] font-bold leading-none text-yellow-200/[0.08] transition duration-500 group-hover:scale-110">0{index + 1}</div>
                 <div className="relative flex h-full flex-col justify-between">
-                  <span className="w-fit rounded-full border border-yellow-200/20 bg-black/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-yellow-200/80">Gallery</span>
+                  <span className="w-fit rounded-full border border-yellow-200/20 bg-black/35 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-yellow-100">Gallery</span>
                   <div>
                     <h3 className="text-3xl font-bold text-yellow-50">{category.name}</h3>
-                    <p className="mt-2 text-sm text-yellow-100/65">{category.caption}</p>
-                    <p className="mt-5 text-xs uppercase tracking-[0.18em] text-yellow-300/80">Add selected photos</p>
+                    <p className="mt-2 text-sm text-yellow-100/80">{category.caption}</p>
+                    <p className="mt-5 text-xs uppercase tracking-[0.18em] text-yellow-300">View full gallery ↗</p>
                   </div>
                 </div>
-              </article>
+              </a>
             ))}
           </div>
         </section>
@@ -92,11 +101,11 @@ export default function Home() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-yellow-400">Stay connected</p>
             <h2 id="social-heading" className="mt-3 text-3xl font-bold tracking-tight text-yellow-50">Follow Nanda Photography</h2>
-            <p className="mt-2 text-sm text-yellow-100/60">Your social links will appear here once added.</p>
+            <p className="mt-2 text-sm text-yellow-100/60">See our latest stories, films, and celebrations.</p>
           </div>
           <div className="mt-6 flex flex-wrap gap-3 sm:mt-0 sm:justify-end">
-            {["Instagram", "YouTube", "Facebook", "WhatsApp"].map((platform) => (
-              <span key={platform} className="rounded-full border border-yellow-400/25 bg-black/20 px-4 py-2 text-sm font-medium text-yellow-100/75">{platform}</span>
+            {socialLinks.map((platform) => (
+              <a key={platform.name} href={platform.href} target="_blank" rel="noreferrer" className="rounded-full border border-yellow-400/25 bg-black/20 px-4 py-2 text-sm font-medium text-yellow-100/75 transition hover:border-yellow-300 hover:bg-yellow-300/10 hover:text-yellow-100">{platform.name} ↗</a>
             ))}
           </div>
         </section>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BrandMark } from "../components/brand-mark";
 import { packages } from "../data/packages";
 import {
   quotationEventTypes,
@@ -263,7 +264,7 @@ export default function QuotationPage() {
     <main className="min-h-screen bg-[#080704] px-5 py-8 text-yellow-50 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-6xl rounded-3xl border border-yellow-500/30 bg-[#12100a] p-6 shadow-2xl shadow-black/50 sm:p-10">
         <header className="border-b border-yellow-500/25 pb-7">
-          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-yellow-400">Nanda Photography</p>
+          <BrandMark className="text-yellow-300" />
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="text-4xl font-bold tracking-tight text-yellow-100 sm:text-5xl">Wedding quotation</h1>

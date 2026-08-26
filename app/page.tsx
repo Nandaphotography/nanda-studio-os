@@ -1,11 +1,10 @@
 import Link from "next/link";
+import { BrandMark } from "./components/brand-mark";
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-100 p-10">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow p-8">
-        <h1 className="text-4xl font-bold text-gray-800">
-          Nanda Studio OS
-        </h1>
+        <BrandMark className="text-gray-800" />
 
         <p className="mt-3 text-gray-600">
           Wedding Photography Management System

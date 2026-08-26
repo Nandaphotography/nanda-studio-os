@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandMark } from "../components/brand-mark";
 import { useSyncExternalStore } from "react";
 import {
   getSavedQuotations,
@@ -45,7 +46,7 @@ export default function ProjectsPage() {
       <div className="mx-auto max-w-6xl rounded-3xl border border-yellow-500/30 bg-[#12100a] p-6 shadow-2xl shadow-black/50 sm:p-10">
         <header className="flex flex-col gap-5 border-b border-yellow-500/25 pb-7 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-yellow-400">Nanda Photography</p>
+            <BrandMark className="text-yellow-300" />
             <h1 className="mt-3 text-4xl font-bold tracking-tight text-yellow-100">Wedding projects</h1>
             <p className="mt-2 text-yellow-100/65">Saved quotations and their current booking status.</p>
           </div>

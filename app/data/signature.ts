@@ -2,6 +2,7 @@ export type SignatureEvent = {
   id: string;
   name: string;
   crew: string[];
+  coverageOptions?: SignatureCoverageOption[];
 };
 
 export const quotationEventTypes = [
@@ -84,6 +85,12 @@ export const signatureDeliverables = [
 ] as const;
 
 export const signatureEvents: SignatureEvent[] = [
+  {
+    id: "pre-wedding",
+    name: "Pre-Wedding",
+    crew: ["Candid Photographer", "Candid Cinematographer", "Drone"],
+    coverageOptions: ["Candid Photographer", "Candid Cinematographer", "Drone"],
+  },
   {
     id: "birthday",
     name: "Birthday",

@@ -75,6 +75,16 @@ export const signatureDeliverables = [
 
 export const signatureEvents: SignatureEvent[] = [
   {
+    id: "birthday",
+    name: "Birthday",
+    crew: [],
+  },
+  {
+    id: "half-saree",
+    name: "Half Saree",
+    crew: [],
+  },
+  {
     id: "engagement",
     name: "Engagement",
     crew: [],
@@ -123,5 +133,10 @@ export const signatureEvents: SignatureEvent[] = [
     id: "dinner-guest-coverage",
     name: "Dinner & Guest Coverage",
     crew: ["1 Traditional Photographer", "1 Traditional Videographer"],
+  },
+  {
+    id: "other-event-up-to-5-hours",
+    name: "Other Event (Up to 5 Hours)",
+    crew: [],
   },
 ];

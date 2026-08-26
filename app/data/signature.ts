@@ -53,6 +53,11 @@ export const signatureEventAddOns = [
 
 export const signatureDeliverables = [
   {
+    id: "canvera-premium-small-20",
+    name: "Premium Canvera Album Small (12x18 Inches) - 20 Sheets",
+    price: 5000,
+  },
+  {
     id: "canvera-premium-30",
     name: "Premium Canvera Album (13x40 Inches) - 30 Sheets",
     price: signatureRates["30-sheet album"],

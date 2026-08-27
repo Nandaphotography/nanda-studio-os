@@ -71,6 +71,10 @@ export default function QuotationPage() {
   const [generationError, setGenerationError] = useState("");
   const [savedQuoteNumber, setSavedQuoteNumber] = useState("");
 
+  const selectedEventTypeDetails = quotationEventTypes.find(
+    (eventType) => eventType.id === selectedEventType
+  );
+
   const selectedEvents = signatureEvents.filter((event) =>
     selectedSignatureEvents.includes(event.id)
   );
@@ -285,39 +289,19 @@ export default function QuotationPage() {
             <p className="text-sm text-yellow-100/55">Choose the occasion first</p>
           </div>
           <div className="mt-5 grid gap-5 md:grid-cols-3">
-            {quotationEventTypes.map((eventType) => {
-              const isSelected = selectedEventType === eventType.id;
-              return (
-                <button key={eventType.id} type="button" onClick={() => selectEventType(eventType.id)} aria-pressed={isSelected} className={`rounded-2xl border p-6 text-left transition ${isSelected ? "border-yellow-300 bg-yellow-400/15 ring-1 ring-yellow-300" : "border-yellow-500/25 bg-black/20 hover:border-yellow-400 hover:bg-white/5"}`}>
-                  <h3 className="text-xl font-bold text-yellow-100">{eventType.name}</h3>
-                  <p className="mt-3 text-sm leading-6 text-yellow-100/65">{eventType.description}</p>
-                  <p className="mt-5 text-sm font-semibold text-yellow-200">{isSelected ? "Selected" : "Choose event"}</p>
-                </button>
-              );
-            })}
+            {(selectedEventTypeDetails ? [selectedEventTypeDetails] : quotationEventTypes).map((eventType) => (
+              <EventTypeCard key={eventType.id} eventType={eventType} isSelected={eventType.id === selectedEventType} onSelect={selectEventType} />
+            ))}
           </div>
+
+          {selectedEventType === "wedding" && (
+            <WeddingPackages selectedPackage={selectedPackage} onSelectPackage={selectPackage} />
+          )}
         </section>
-
-        {selectedEventType === "wedding" && (
-          <section className="mt-9">
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="text-2xl font-semibold">2. Select a Wedding package</h2>
-              <p className="text-sm text-yellow-100/55">All prices are in INR</p>
-            </div>
-            <div className="mt-5 grid gap-5 md:grid-cols-3">
-              {packages.map((pkg) => {
-                const isSelected = selectedPackage?.id === pkg.id;
-                return <button key={pkg.id} type="button" onClick={() => selectPackage(pkg)} aria-pressed={isSelected} className={`rounded-2xl border p-6 text-left transition ${isSelected ? "border-yellow-300 bg-yellow-400/15 ring-1 ring-yellow-300" : "border-yellow-500/25 bg-black/20 hover:border-yellow-400 hover:bg-white/5"}`}><div className="flex items-start justify-between gap-3"><h3 className="text-xl font-bold text-yellow-100">{pkg.name}</h3><span className="text-sm font-semibold text-yellow-300">{pkg.price ? formatPrice(pkg.price) : "Custom"}</span></div><p className="mt-3 text-sm leading-6 text-yellow-100/65">{pkg.description}</p><p className="mt-5 text-sm font-semibold text-yellow-200">{isSelected ? "Selected" : "Choose package"}</p></button>;
-              })}
-            </div>
-          </section>
-        )}
-
-        {selectedPackage && !selectedPackage.customizable && <PackageDetails selectedPackage={selectedPackage} />}
 
         {selectedPackage?.customizable && (
           <section className="mt-9 rounded-2xl border border-yellow-500/25 bg-black/20 p-6 sm:p-7">
-            <h2 className="text-2xl font-semibold">{selectedEventType === "wedding" ? "3. Create your Signature coverage" : `2. Create your ${selectedPackage.name}`}</h2>
+            <h2 className="text-2xl font-semibold">{selectedEventType === "wedding" ? "2. Create your Signature coverage" : `2. Create your ${selectedPackage.name}`}</h2>
             <p className="mt-2 text-yellow-100/65">Choose the programs, then add the crew for each one. The estimate updates as you go.</p>
             <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {availableCoverageEvents.map((event) => {
@@ -379,7 +363,7 @@ export default function QuotationPage() {
         )}
 
         <section className="mt-9">
-          <h2 className="text-2xl font-semibold">{selectedPackage?.customizable ? (selectedEventType === "wedding" ? "4" : "3") : "3"}. Client details</h2>
+          <h2 className="text-2xl font-semibold">{selectedPackage?.customizable ? "3" : "2"}. Client details</h2>
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <Input label="Client name" value={clientDetails.name} onChange={(value) => updateClientDetail("name", value)} placeholder="Client name" />
             <Input label="Mobile number" value={clientDetails.phone} onChange={(value) => updateClientDetail("phone", value)} placeholder="Mobile number" type="tel" />
@@ -416,6 +400,17 @@ export default function QuotationPage() {
             </div>
           </section>
         )}
+
+        {selectedEventType && (
+          <section className="mt-9 border-t border-yellow-500/20 pt-9">
+            <h2 className="text-lg font-semibold text-yellow-100/75">Other event types</h2>
+            <div className="mt-4 grid gap-5 md:grid-cols-3">
+              {quotationEventTypes.filter((eventType) => eventType.id !== selectedEventType).map((eventType) => (
+                <EventTypeCard key={eventType.id} eventType={eventType} isSelected={false} onSelect={selectEventType} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </main>
   );
@@ -425,10 +420,40 @@ function Input({ label, value, onChange, placeholder, type = "text" }: { label: 
   return <label className="grid gap-2 text-sm font-medium text-yellow-100/80">{label}<input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} type={type} className="rounded-xl border border-yellow-500/30 bg-black/25 px-4 py-3 text-yellow-50 outline-none placeholder:text-yellow-100/35 focus:border-yellow-300 focus:ring-1 focus:ring-yellow-300" /></label>;
 }
 
+function EventTypeCard({ eventType, isSelected, onSelect }: { eventType: (typeof quotationEventTypes)[number]; isSelected: boolean; onSelect: (eventTypeId: QuotationEventTypeId) => void }) {
+  return (
+    <button type="button" onClick={() => onSelect(eventType.id)} aria-pressed={isSelected} aria-expanded={isSelected} className={`rounded-2xl border p-6 text-left transition ${isSelected ? "border-yellow-300 bg-yellow-400/15 ring-1 ring-yellow-300" : "border-yellow-500/25 bg-black/20 hover:border-yellow-400 hover:bg-white/5"}`}>
+      <h3 className="text-xl font-bold text-yellow-100">{eventType.name}</h3>
+      <p className="mt-3 text-sm leading-6 text-yellow-100/65">{eventType.description}</p>
+      <p className="mt-5 text-sm font-semibold text-yellow-200">{isSelected ? "Selected" : "Choose event"}</p>
+    </button>
+  );
+}
+
+function WeddingPackages({ selectedPackage, onSelectPackage }: { selectedPackage: SelectedPackage | null; onSelectPackage: (pkg: Package) => void }) {
+  return (
+    <section className="wedding-packages-reveal mt-5 rounded-2xl border border-yellow-500/25 bg-black/20 p-6 sm:p-7" aria-label="Wedding packages">
+      <div className="grid gap-1">
+        <h2 className="text-xl font-semibold text-yellow-200">Wedding packages</h2>
+        <p className="text-sm text-yellow-100/55">All prices are in INR</p>
+      </div>
+      <div className="mt-5 grid gap-5 md:grid-cols-3">
+        {packages.map((pkg) => {
+          const isSelected = selectedPackage?.id === pkg.id;
+          return <button key={pkg.id} type="button" onClick={() => onSelectPackage(pkg)} aria-pressed={isSelected} className={`rounded-2xl border p-6 text-left transition ${isSelected ? "border-yellow-300 bg-yellow-400/15 ring-1 ring-yellow-300" : "border-yellow-500/25 bg-black/20 hover:border-yellow-400 hover:bg-white/5"}`}><div className="flex items-start justify-between gap-3"><h3 className="text-xl font-bold text-yellow-100">{pkg.name}</h3><span className="text-sm font-semibold text-yellow-300">{pkg.price ? formatPrice(pkg.price) : "Custom"}</span></div><p className="mt-3 text-sm leading-6 text-yellow-100/65">{pkg.description}</p><p className="mt-5 text-sm font-semibold text-yellow-200">{isSelected ? "Selected" : "Choose package"}</p></button>;
+        })}
+      </div>
+      {selectedPackage && !selectedPackage.customizable && (
+        <PackageDetails selectedPackage={selectedPackage} />
+      )}
+    </section>
+  );
+}
+
 function PackageDetails({ selectedPackage }: { selectedPackage: Exclude<Package, { customizable: true }> }) {
   const sections = [["Photography", selectedPackage.photography], ["Videography", selectedPackage.videography], ["Production", selectedPackage.production], ["Deliverables", selectedPackage.deliverables], ["Complimentary", selectedPackage.complimentary]] as const;
   const eventSections = selectedPackage.events && !Array.isArray(selectedPackage.events) ? Object.entries(selectedPackage.events) : [];
-  return <section className="mt-9 rounded-2xl border border-yellow-500/25 bg-black/20 p-6 sm:p-7"><h2 className="text-2xl font-semibold">What&apos;s included</h2><div className="mt-5 grid gap-6 md:grid-cols-2">{sections.map(([title, items]) => items?.length ? <PackageList key={title} title={title} items={items} /> : null)}{eventSections.length > 0 && <div><h3 className="font-semibold text-yellow-300">Event coverage</h3><div className="mt-3 grid gap-3">{eventSections.map(([event, items]) => <PackageList key={event} title={event} items={items} compact />)}</div></div>}</div></section>;
+  return <section className="mt-9 rounded-2xl border border-yellow-500/25 bg-black/20 p-6"><h2 className="text-2xl font-semibold">What&apos;s included</h2><div className="mt-5 grid gap-6">{sections.map(([title, items]) => items?.length ? <PackageList key={title} title={title} items={items} /> : null)}{eventSections.length > 0 && <div><h3 className="font-semibold text-yellow-300">Event coverage</h3><div className="mt-3 grid gap-3">{eventSections.map(([event, items]) => <PackageList key={event} title={event} items={items} compact />)}</div></div>}</div></section>;
 }
 
 function PackageList({ title, items, compact = false }: { title: string; items: readonly string[]; compact?: boolean }) {
